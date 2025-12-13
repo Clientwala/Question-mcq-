@@ -1,0 +1,27 @@
+# KVS PGT Document Generator - Python Dependencies
+
+# Core dependency for Word document generation
+python-docx==0.8.11
+
+# Optional: For enhanced PDF processing (if needed in future)
+# PyPDF2==3.0.1
+# pdfplumber==0.10.3
+
+# Optional: For web application (Phase 2)
+# fastapi==0.104.1
+# uvicorn[standard]==0.24.0
+# celery==5.3.4
+# redis==5.0.1
+# psycopg2-binary==2.9.9
+# python-multipart==0.0.6
+# python-jose[cryptography]==3.3.0
+# passlib[bcrypt]==1.7.4
+
+# Optional: For ML-based parsing (Phase 3)
+# transformers==4.35.2
+# torch==2.1.1
+
+# Development dependencies (optional)
+# pytest==7.4.3
+# black==23.11.0
+# flake8==6.1.0
