@@ -2,7 +2,7 @@
 # Deploy all services with single click
 
 databases:
-  # PostgreSQL Database
+  # PostgreSQL Database (No free tier - minimum $7/month)
   - name: question-postgres
     databaseName: questionmcq
     user: questionuser
@@ -10,19 +10,18 @@ databases:
     region: singapore
 
 services:
-  # Redis Instance
+  # Redis Instance (No free tier - minimum $10/month)
   - type: redis
     name: question-redis
     plan: starter
     region: singapore
     ipAllowList: []
 
-  # Backend API (FastAPI + Socket.IO)
+  # Backend API (FastAPI + Socket.IO) - Free Tier
   - type: web
     name: question-backend
     runtime: python
-    region: singapore
-    plan: starter
+    plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
@@ -63,17 +62,12 @@ services:
         value: /var/data
       - key: MAX_UPLOAD_SIZE
         value: "52428800"
-    disk:
-      name: question-storage
-      mountPath: /var/data
-      sizeGB: 10
 
-  # Celery Worker (Background Tasks)
+  # Celery Worker (Background Tasks) - Free Tier
   - type: worker
     name: question-worker
     runtime: python
-    region: singapore
-    plan: starter
+    plan: free
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: celery -A app.core.celery_app worker --loglevel=info --pool=solo
@@ -109,16 +103,11 @@ services:
         value: INFO
       - key: STORAGE_PATH
         value: /var/data
-    disk:
-      name: question-storage
-      mountPath: /var/data
-      sizeGB: 10
 
-  # Frontend (React + Vite)
+  # Frontend (React + Vite) - Free Tier
   - type: web
     name: question-frontend
     runtime: static
-    region: singapore
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     pullRequestPreviewsEnabled: true
