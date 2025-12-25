@@ -1,110 +1,8 @@
 # Render Blueprint Configuration
-# Deploy all services with single click
-
-databases:
-  # PostgreSQL Database (No free tier - minimum $7/month)
-  - name: question-postgres
-    databaseName: questionmcq
-    user: questionuser
-    plan: starter
-    region: singapore
+# Frontend only deployment - Backend will be deployed separately later
 
 services:
-  # Redis Instance (No free tier - minimum $10/month)
-  - type: redis
-    name: question-redis
-    plan: starter
-    region: singapore
-    ipAllowList: []
-
-  # Backend API (FastAPI + Socket.IO) - Free Tier
-  - type: web
-    name: question-backend
-    runtime: python
-    plan: free
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /health
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.0
-      - key: DATABASE_URL
-        fromDatabase:
-          name: question-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: question-redis
-          property: connectionString
-      - key: CELERY_BROKER_URL
-        fromService:
-          type: redis
-          name: question-redis
-          property: connectionString
-      - key: CELERY_RESULT_BACKEND
-        fromService:
-          type: redis
-          name: question-redis
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: ENVIRONMENT
-        value: production
-      - key: DEBUG
-        value: "False"
-      - key: LOG_LEVEL
-        value: INFO
-      - key: CORS_ORIGINS
-        sync: false
-      - key: STORAGE_PATH
-        value: /var/data
-      - key: MAX_UPLOAD_SIZE
-        value: "52428800"
-
-  # Celery Worker (Background Tasks) - Free Tier
-  - type: worker
-    name: question-worker
-    runtime: python
-    plan: free
-    rootDir: backend
-    buildCommand: pip install -r requirements.txt
-    startCommand: celery -A app.core.celery_app worker --loglevel=info --pool=solo
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.12.0
-      - key: DATABASE_URL
-        fromDatabase:
-          name: question-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: question-redis
-          property: connectionString
-      - key: CELERY_BROKER_URL
-        fromService:
-          type: redis
-          name: question-redis
-          property: connectionString
-      - key: CELERY_RESULT_BACKEND
-        fromService:
-          type: redis
-          name: question-redis
-          property: connectionString
-      - key: SECRET_KEY
-        generateValue: true
-      - key: ENVIRONMENT
-        value: production
-      - key: DEBUG
-        value: "False"
-      - key: LOG_LEVEL
-        value: INFO
-      - key: STORAGE_PATH
-        value: /var/data
-
-  # Frontend (React + Vite) - Free Tier
+  # Frontend (React + Vite) - Free Static Site
   - type: web
     name: question-frontend
     runtime: static
@@ -115,7 +13,7 @@ services:
       - key: NODE_VERSION
         value: 20.10.0
       - key: VITE_API_URL
-        sync: false
+        value: http://localhost:8000
     routes:
       - type: rewrite
         source: /*
