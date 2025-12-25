@@ -1,0 +1,84 @@
+# Environment Variables (SENSITIVE - DO NOT COMMIT)
+.env
+.env.local
+.env.production
+backend/.env
+frontend/.env
+frontend/.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+
+# Node / Frontend
+node_modules/
+frontend/node_modules/
+.npm
+.eslintcache
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Data & Outputs (Generated Files)
+data/
+*.docx
+*.pdf
+!README.pdf
+*.txt
+!requirements.txt
+!README.txt
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Redis
+backend/Redis/
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+~$*
+nul
+
+# Alembic
+alembic/versions/*.pyc
+
+# Claude
+.claude/settings.local.json
+
+# Specific project files to ignore
+postcss.config.js
+tailwind.config.js
