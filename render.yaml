@@ -1,15 +1,15 @@
-services:
+# Render Blueprint Configuration
+# Deploy all services with single click
+
+databases:
   # PostgreSQL Database
-  - type: pserv
-    name: question-postgres
-    env: docker
+  - name: question-postgres
+    databaseName: questionmcq
+    user: questionuser
     plan: starter
     region: singapore
-    databases:
-      - name: questionmcq
-        user: questionuser
-        ipAllowList: []
 
+services:
   # Redis Instance
   - type: redis
     name: question-redis
@@ -20,11 +20,13 @@ services:
   # Backend API (FastAPI + Socket.IO)
   - type: web
     name: question-backend
-    env: python
+    runtime: python
     region: singapore
     plan: starter
-    buildCommand: cd backend && pip install -r requirements.txt
-    startCommand: cd backend && uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:socket_app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
@@ -52,28 +54,29 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: DEBUG
-        value: False
+        value: "False"
       - key: LOG_LEVEL
         value: INFO
       - key: CORS_ORIGINS
         sync: false
       - key: STORAGE_PATH
-        value: /opt/render/project/data
+        value: /var/data
       - key: MAX_UPLOAD_SIZE
-        value: 52428800
+        value: "52428800"
     disk:
       name: question-storage
-      mountPath: /opt/render/project/data
+      mountPath: /var/data
       sizeGB: 10
 
   # Celery Worker (Background Tasks)
   - type: worker
     name: question-worker
-    env: python
+    runtime: python
     region: singapore
     plan: starter
-    buildCommand: cd backend && pip install -r requirements.txt
-    startCommand: cd backend && celery -A app.core.celery_app worker --loglevel=info --pool=solo
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A app.core.celery_app worker --loglevel=info --pool=solo
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
@@ -101,24 +104,24 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: DEBUG
-        value: False
+        value: "False"
       - key: LOG_LEVEL
         value: INFO
       - key: STORAGE_PATH
-        value: /opt/render/project/data
+        value: /var/data
     disk:
       name: question-storage
-      mountPath: /opt/render/project/data
+      mountPath: /var/data
       sizeGB: 10
 
   # Frontend (React + Vite)
   - type: web
     name: question-frontend
-    env: static
+    runtime: static
     region: singapore
-    plan: starter
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
+    pullRequestPreviewsEnabled: true
     envVars:
       - key: NODE_VERSION
         value: 20.10.0
